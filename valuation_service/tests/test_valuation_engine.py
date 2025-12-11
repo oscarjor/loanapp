@@ -228,3 +228,128 @@ class TestValuationEngine:
         assert result1.estimated_value == result2.estimated_value
         assert result1.breakdown.base_value == result2.breakdown.base_value
         assert result1.breakdown.depreciation_factor == result2.breakdown.depreciation_factor
+
+    def test_newer_property_has_higher_value_than_older(self, engine):
+        """
+        Test business rule: A newer property should have a higher value than
+        an older property with the same description (type and size).
+
+        This validates the requirement that age affects value negatively.
+        """
+        property_type = PropertyType.MULTIFAMILY
+        size_sqft = 50000
+
+        # New property (0 years old)
+        new_property = engine.calculate_value(
+            property_type=property_type,
+            size_sqft=size_sqft,
+            age_years=0
+        )
+
+        # Older property (10 years old)
+        older_property = engine.calculate_value(
+            property_type=property_type,
+            size_sqft=size_sqft,
+            age_years=10
+        )
+
+        # Very old property (50 years old)
+        very_old_property = engine.calculate_value(
+            property_type=property_type,
+            size_sqft=size_sqft,
+            age_years=50
+        )
+
+        # Assert that newer properties have higher values
+        assert new_property.estimated_value > older_property.estimated_value, \
+            "A new property should be valued higher than a 10-year-old property"
+
+        assert older_property.estimated_value > very_old_property.estimated_value, \
+            "A 10-year-old property should be valued higher than a 50-year-old property"
+
+        assert new_property.estimated_value > very_old_property.estimated_value, \
+            "A new property should be valued higher than a 50-year-old property"
+
+        # Verify the specific values
+        # New: $50,000 * $200 = $10,000,000 (0% depreciation)
+        assert new_property.estimated_value == 10_000_000.00
+
+        # 10 years: $10,000,000 * (1 - 0.10) = $9,000,000 (10% depreciation)
+        assert older_property.estimated_value == 9_000_000.00
+
+        # 50 years: $10,000,000 * (1 - 0.40) = $6,000,000 (40% depreciation, capped)
+        assert very_old_property.estimated_value == 6_000_000.00
+
+        # Verify depreciation increases with age
+        assert new_property.breakdown.depreciation_factor < older_property.breakdown.depreciation_factor
+        assert older_property.breakdown.depreciation_factor < very_old_property.breakdown.depreciation_factor
+
+    def test_age_comparison_across_all_property_types(self, engine):
+        """
+        Test that age affects value consistently across all property types.
+        For each property type, a newer building should always be worth more.
+        """
+        size_sqft = 20000
+        new_age = 5
+        old_age = 25
+
+        for property_type in PropertyType:
+            new_result = engine.calculate_value(
+                property_type=property_type,
+                size_sqft=size_sqft,
+                age_years=new_age
+            )
+
+            old_result = engine.calculate_value(
+                property_type=property_type,
+                size_sqft=size_sqft,
+                age_years=old_age
+            )
+
+            # Assert newer property is more valuable for every property type
+            assert new_result.estimated_value > old_result.estimated_value, \
+                f"For {property_type}, a {new_age}-year-old property should be worth more than a {old_age}-year-old property"
+
+            # Verify depreciation difference
+            expected_depreciation_diff = 0.20  # 20% difference (25 years - 5 years)
+            actual_depreciation_diff = old_result.breakdown.depreciation_factor - new_result.breakdown.depreciation_factor
+            assert actual_depreciation_diff == expected_depreciation_diff, \
+                f"Depreciation difference should be {expected_depreciation_diff} for {property_type}"
+
+    def test_industrial_50_year_old_vs_new_multifamily(self, engine):
+        """
+        Test specific scenario: A 50-year-old industrial property should be
+        worth less than a new multifamily property of the same size, even though
+        they have different base rates.
+
+        This tests the combined effect of property type and age from requirements.
+        """
+        size_sqft = 100000
+
+        # 50-year-old industrial
+        # Base: 100,000 * $100 = $10,000,000
+        # Depreciation: 40% (capped)
+        # Final: $6,000,000
+        old_industrial = engine.calculate_value(
+            property_type=PropertyType.INDUSTRIAL,
+            size_sqft=size_sqft,
+            age_years=50
+        )
+
+        # New multifamily
+        # Base: 100,000 * $200 = $20,000,000
+        # Depreciation: 0%
+        # Final: $20,000,000
+        new_multifamily = engine.calculate_value(
+            property_type=PropertyType.MULTIFAMILY,
+            size_sqft=size_sqft,
+            age_years=0
+        )
+
+        # The new multifamily should be worth significantly more
+        assert new_multifamily.estimated_value > old_industrial.estimated_value
+        assert old_industrial.estimated_value == 6_000_000.00
+        assert new_multifamily.estimated_value == 20_000_000.00
+
+        # This demonstrates that age can significantly impact value:
+        # A 50-year-old industrial is worth 30% of a new multifamily of the same size

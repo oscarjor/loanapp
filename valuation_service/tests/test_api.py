@@ -287,3 +287,99 @@ class TestAPI:
 
             data = response.json()
             assert data["estimated_value"] > 0
+
+    def test_newer_property_valued_higher_than_older_api(self, client):
+        """
+        Test business requirement via API: A new property with the same
+        description (type and size) should have a higher value than an older property.
+
+        This validates the requirement from the perspective of API consumers.
+        """
+        # Define property characteristics (same for both)
+        property_type = "RETAIL"
+        size_sqft = 25000
+
+        # Request valuation for new property
+        new_property_payload = {
+            "property_type": property_type,
+            "size_sqft": size_sqft,
+            "age_years": 0
+        }
+        new_response = client.post("/api/v1/valuate", json=new_property_payload)
+        assert new_response.status_code == 200
+        new_data = new_response.json()
+
+        # Request valuation for 15-year-old property
+        old_property_payload = {
+            "property_type": property_type,
+            "size_sqft": size_sqft,
+            "age_years": 15
+        }
+        old_response = client.post("/api/v1/valuate", json=old_property_payload)
+        assert old_response.status_code == 200
+        old_data = old_response.json()
+
+        # Verify new property has higher value
+        assert new_data["estimated_value"] > old_data["estimated_value"], \
+            "A new property should be valued higher than a 15-year-old property with same characteristics"
+
+        # Verify the depreciation is reflected in the breakdown
+        assert new_data["breakdown"]["depreciation_factor"] < old_data["breakdown"]["depreciation_factor"], \
+            "An older property should have higher depreciation factor"
+
+        # Verify specific expected values
+        # New: 25,000 * $150 = $3,750,000 (0% depreciation)
+        assert new_data["estimated_value"] == 3_750_000.00
+        assert new_data["breakdown"]["depreciation_factor"] == 0.0
+
+        # 15 years: $3,750,000 * (1 - 0.15) = $3,187,500 (15% depreciation)
+        assert old_data["estimated_value"] == 3_187_500.00
+        assert old_data["breakdown"]["depreciation_factor"] == 0.15
+
+    def test_age_impact_comparison_multiple_properties_api(self, client):
+        """
+        Test that age consistently affects value across different scenarios via API.
+        Compare properties at different ages to ensure correct ordering.
+        """
+        base_payload = {
+            "property_type": "MULTIFAMILY",
+            "size_sqft": 30000
+        }
+
+        # Test with multiple ages
+        ages = [0, 10, 20, 40, 60]
+        results = []
+
+        for age in ages:
+            payload = {**base_payload, "age_years": age}
+            response = client.post("/api/v1/valuate", json=payload)
+            assert response.status_code == 200
+            data = response.json()
+            results.append({
+                "age": age,
+                "value": data["estimated_value"],
+                "depreciation": data["breakdown"]["depreciation_factor"]
+            })
+
+        # Verify values decrease with age (or stay same when depreciation is capped)
+        for i in range(len(results) - 1):
+            current = results[i]
+            next_result = results[i + 1]
+
+            assert current["value"] >= next_result["value"], \
+                f"Property at age {current['age']} should be worth at least as much or more than at age {next_result['age']}"
+
+            # Verify depreciation increases (up to the cap)
+            assert current["depreciation"] <= next_result["depreciation"], \
+                f"Depreciation should increase or stay capped as age increases"
+
+        # Verify specific values
+        assert results[0]["value"] == 6_000_000.00  # 0 years: no depreciation
+        assert results[1]["value"] == 5_400_000.00  # 10 years: 10% depreciation
+        assert results[2]["value"] == 4_800_000.00  # 20 years: 20% depreciation
+        assert results[3]["value"] == 3_600_000.00  # 40 years: 40% depreciation (capped)
+        assert results[4]["value"] == 3_600_000.00  # 60 years: 40% depreciation (still capped)
+
+        # Verify depreciation cap
+        assert results[3]["depreciation"] == 0.40
+        assert results[4]["depreciation"] == 0.40
