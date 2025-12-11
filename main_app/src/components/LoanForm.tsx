@@ -164,7 +164,7 @@ export function LoanForm({
 
         <div>
           <label htmlFor="propertyAgeYears" className="block text-sm font-medium text-gray-700">
-            Age (years)
+            Property Age (years)
           </label>
           <input
             type="number"
@@ -176,6 +176,7 @@ export function LoanForm({
             className={`mt-1 block w-full rounded-md border ${
               errors.propertyAgeYears ? 'border-red-300' : 'border-gray-300'
             } px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500`}
+            placeholder="e.g., 10"
           />
           {errors.propertyAgeYears && (
             <p className="mt-1 text-sm text-red-600">{errors.propertyAgeYears}</p>
