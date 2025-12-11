@@ -1,0 +1,20 @@
+{
+  "name": "automated-tests",
+  "version": "1.0.0",
+  "description": "Automated tests for Loan Application Portal",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:crud": "playwright test tests/crud.spec.js",
+    "test:valuation": "playwright test tests/valuation.spec.js",
+    "report": "playwright show-report"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.48.2"
+  }
+}

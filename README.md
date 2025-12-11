@@ -59,6 +59,13 @@ loan-application-portal/
 │   ├── Dockerfile
 │   └── requirements.txt
 │
+├── automated_tests/             # Playwright E2E tests
+│   ├── tests/
+│   │   ├── crud.spec.js         # CRUD operation tests
+│   │   └── valuation.spec.js    # Valuation flow tests
+│   ├── playwright.config.js     # Playwright configuration
+│   └── package.json
+│
 ├── docker-compose.yml           # Orchestration for all services
 ├── requirements.md
 └── ARCHITECTURE.md
@@ -201,6 +208,42 @@ npm run db:studio
 ```
 
 ## Testing
+
+### Automated UI Tests (Playwright)
+
+```bash
+cd automated_tests
+
+# Install dependencies
+npm install
+
+# Install Playwright browsers
+npx playwright install chromium
+
+# Run all tests
+npm test
+
+# Run specific test suites
+npm run test:crud          # CRUD operation tests
+npm run test:valuation     # Valuation flow tests
+
+# Run with browser visible
+npm run test:headed
+
+# Run in interactive UI mode
+npm run test:ui
+
+# View test report
+npm run report
+```
+
+**Test Coverage**: 14 E2E tests (all passing ✅):
+- **CRUD Operations**: Create, read, update, delete loan applications (7 tests)
+- **Valuation Flow**: Property valuation and LTV-based approval/rejection (7 tests)
+- Form validation and error handling
+- Different property types and depreciation scenarios
+
+See [automated_tests/README.md](./automated_tests/README.md) for complete documentation.
 
 ### Valuation Service Tests
 
