@@ -1,0 +1,44 @@
+[MAIN]
+# Specify Python version
+py-version=3.11
+
+# Discover python modules and packages in the file system subtree.
+recursive=yes
+
+# Files or directories to be skipped
+ignore=venv,.venv,htmlcov,.pytest_cache
+
+[MESSAGES CONTROL]
+# Disable specific warnings that are handled by other tools or are not relevant
+disable=
+
+[FORMAT]
+# Maximum number of characters on a single line
+max-line-length=100
+
+# Maximum number of lines in a module
+max-module-lines=1000
+
+[BASIC]
+# Good variable names which should always be accepted
+good-names=i,j,k,ex,Run,_,e,v
+
+[DESIGN]
+# Maximum number of arguments for function / method
+max-args=5
+
+# Maximum number of attributes for a class
+max-attributes=7
+
+# Maximum number of public methods for a class (excluding test classes)
+max-public-methods=20
+
+[SIMILARITIES]
+# Minimum lines number of a similarity
+min-similarity-lines=4
+
+# Ignore comments when computing similarities
+ignore-comments=yes
+
+# Ignore docstrings when computing similarities
+ignore-docstrings=yes

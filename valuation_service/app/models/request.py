@@ -1,5 +1,7 @@
-from pydantic import BaseModel, Field, field_validator
+"""Request models for property valuation."""
 from enum import Enum
+
+from pydantic import BaseModel, Field, field_validator
 
 
 class PropertyType(str, Enum):
@@ -31,6 +33,7 @@ class ValuationRequest(BaseModel):
     @field_validator('size_sqft')
     @classmethod
     def validate_size(cls, v: int) -> int:
+        """Validate property size is within acceptable range."""
         if v <= 0:
             raise ValueError("Property size must be greater than 0")
         if v > 10_000_000:
@@ -40,13 +43,15 @@ class ValuationRequest(BaseModel):
     @field_validator('age_years')
     @classmethod
     def validate_age(cls, v: int) -> int:
+        """Validate property age is within acceptable range."""
         if v < 0:
             raise ValueError("Property age cannot be negative")
         if v > 200:
             raise ValueError("Property age exceeds reasonable limit (200 years)")
         return v
 
-    class Config:
+    class Config:  # pylint: disable=too-few-public-methods
+        """Pydantic configuration."""
         use_enum_values = True
         json_schema_extra = {
             "example": {

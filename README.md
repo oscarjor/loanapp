@@ -263,6 +263,97 @@ pytest tests/test_valuation_engine.py -v
 
 Test coverage: **89%** (151/170 statements)
 
+## Code Quality & Linting
+
+This project enforces code quality through automated linting and pre-commit hooks.
+
+### Pre-Commit Hooks
+
+Pre-commit hooks automatically run before each commit to ensure code quality:
+
+**What happens on commit:**
+1. Hook detects staged TypeScript and Python files
+2. Runs appropriate linters (ESLint for TS, Pylint for Python)
+3. Blocks commit if any errors are found
+4. Provides clear error messages for fixing
+
+**Example successful commit:**
+```bash
+$ git commit -m "Add new feature"
+Running pre-commit checks...
+Checking TypeScript files in main_app...
+✓ ESLint check passed
+✓ TypeScript check passed
+
+All pre-commit checks passed!
+[main abc1234] Add new feature
+```
+
+**Example failed commit:**
+```bash
+$ git commit -m "Add feature"
+Running pre-commit checks...
+Checking TypeScript files in main_app...
+
+/path/to/file.ts
+  9:33  error  Prefer using nullish coalescing operator (`??`) instead of (`||`)
+
+ESLint check failed!
+Please fix the linting errors before committing.
+
+Pre-commit checks failed! Commit aborted.
+```
+
+**Bypassing hooks (not recommended):**
+```bash
+git commit -m "Your message" --no-verify
+```
+
+### Manual Linting
+
+**Main App (TypeScript/React):**
+```bash
+cd main_app
+npm run lint        # Check for issues
+npm run lint:fix    # Auto-fix many issues
+npm run build:client # Check TypeScript compilation
+```
+
+**Valuation Service (Python):**
+```bash
+cd valuation_service
+make lint           # Run pylint
+make test           # Run tests
+make coverage       # Run with coverage
+
+# Or manually:
+source venv/bin/activate
+pylint app tests
+```
+
+**Linting Configuration Files:**
+- main_app: `eslint.config.js`
+- valuation_service: `.pylintrc`
+
+**Current Scores:**
+- **main_app**: ESLint passing with 0 errors, 0 warnings
+- **valuation_service**: Pylint **10.00/10**
+
+### Troubleshooting
+
+**"venv not found" for valuation_service:**
+```bash
+cd valuation_service
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+**Pre-commit hook not running:**
+```bash
+chmod +x .git/hooks/pre-commit
+```
+
 ## Environment Variables
 
 ### Main App (.env)

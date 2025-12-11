@@ -1,8 +1,11 @@
+"""API routes for property valuation."""
+import logging
+
 from fastapi import APIRouter, HTTPException, status
+
 from app.models.request import ValuationRequest
 from app.models.response import ValuationResponse, ErrorResponse
 from app.services.valuation_engine import ValuationEngine
-import logging
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -49,8 +52,8 @@ async def valuate_property(request: ValuationRequest) -> ValuationResponse:
     """
     try:
         logger.info(
-            f"Valuation request received: type={request.property_type}, "
-            f"size={request.size_sqft}sqft, age={request.age_years}yrs"
+            "Valuation request received: type=%s, size=%ssqft, age=%syrs",
+            request.property_type, request.size_sqft, request.age_years
         )
 
         # Calculate valuation
@@ -61,23 +64,23 @@ async def valuate_property(request: ValuationRequest) -> ValuationResponse:
         )
 
         logger.info(
-            f"Valuation calculated: ${result.estimated_value:,.2f}"
+            "Valuation calculated: $%s", f"{result.estimated_value:,.2f}"
         )
 
         return result
 
     except ValueError as e:
-        logger.error(f"Validation error: {str(e)}")
+        logger.error("Validation error: %s", str(e))
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=str(e)
-        )
+        ) from e
     except Exception as e:
-        logger.error(f"Unexpected error during valuation: {str(e)}", exc_info=True)
+        logger.error("Unexpected error during valuation: %s", str(e), exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error during valuation calculation"
-        )
+        ) from e
 
 
 @router.get(

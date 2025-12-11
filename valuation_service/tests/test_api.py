@@ -1,9 +1,11 @@
+"""Tests for FastAPI endpoints."""
 import pytest
 from fastapi.testclient import TestClient
+
 from app.main import app
 
 
-class TestAPI:
+class TestAPI:  # pylint: disable=too-many-public-methods
     """Test suite for FastAPI endpoints."""
 
     @pytest.fixture
@@ -320,12 +322,16 @@ class TestAPI:
         old_data = old_response.json()
 
         # Verify new property has higher value
-        assert new_data["estimated_value"] > old_data["estimated_value"], \
-            "A new property should be valued higher than a 15-year-old property with same characteristics"
+        assert new_data["estimated_value"] > old_data["estimated_value"], (
+            "A new property should be valued higher than a 15-year-old property "
+            "with same characteristics"
+        )
 
         # Verify the depreciation is reflected in the breakdown
-        assert new_data["breakdown"]["depreciation_factor"] < old_data["breakdown"]["depreciation_factor"], \
+        assert (new_data["breakdown"]["depreciation_factor"] <
+                old_data["breakdown"]["depreciation_factor"]), (
             "An older property should have higher depreciation factor"
+        )
 
         # Verify specific expected values
         # New: 25,000 * $150 = $3,750,000 (0% depreciation)
@@ -366,12 +372,15 @@ class TestAPI:
             current = results[i]
             next_result = results[i + 1]
 
-            assert current["value"] >= next_result["value"], \
-                f"Property at age {current['age']} should be worth at least as much or more than at age {next_result['age']}"
+            assert current["value"] >= next_result["value"], (
+                f"Property at age {current['age']} should be worth at least as much "
+                f"or more than at age {next_result['age']}"
+            )
 
             # Verify depreciation increases (up to the cap)
-            assert current["depreciation"] <= next_result["depreciation"], \
-                f"Depreciation should increase or stay capped as age increases"
+            assert current["depreciation"] <= next_result["depreciation"], (
+                "Depreciation should increase or stay capped as age increases"
+            )
 
         # Verify specific values
         assert results[0]["value"] == 6_000_000.00  # 0 years: no depreciation

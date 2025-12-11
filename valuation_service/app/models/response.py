@@ -1,6 +1,8 @@
-from pydantic import BaseModel, Field
+"""Response models for property valuation."""
 from datetime import datetime
 from typing import Optional
+
+from pydantic import BaseModel, Field
 
 
 class ValuationBreakdown(BaseModel):
@@ -43,7 +45,8 @@ class ValuationResponse(BaseModel):
         description="Detailed calculation breakdown"
     )
 
-    class Config:
+    class Config:  # pylint: disable=too-few-public-methods
+        """Pydantic configuration."""
         json_schema_extra = {
             "example": {
                 "estimated_value": 8500000.00,

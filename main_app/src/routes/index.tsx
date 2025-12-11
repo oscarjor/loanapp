@@ -27,7 +27,7 @@ function Home() {
 
   const createMutation = trpc.loan.create.useMutation({
     onSuccess: () => {
-      utils.loan.list.invalidate()
+      void utils.loan.list.invalidate()
       setModalState({ type: 'none' })
       setSuccess('Loan application created successfully!')
       setTimeout(() => setSuccess(null), 5000)
@@ -39,7 +39,7 @@ function Home() {
 
   const updateMutation = trpc.loan.update.useMutation({
     onSuccess: () => {
-      utils.loan.list.invalidate()
+      void utils.loan.list.invalidate()
       setModalState({ type: 'none' })
       setSuccess('Loan application updated successfully!')
       setTimeout(() => setSuccess(null), 5000)
@@ -51,7 +51,7 @@ function Home() {
 
   const deleteMutation = trpc.loan.delete.useMutation({
     onSuccess: () => {
-      utils.loan.list.invalidate()
+      void utils.loan.list.invalidate()
       setModalState({ type: 'none' })
       setSuccess('Loan application deleted successfully!')
       setTimeout(() => setSuccess(null), 5000)
@@ -62,12 +62,13 @@ function Home() {
   })
 
   const valuationMutation = trpc.loan.requestValuation.useMutation({
-    onSuccess: (data: any) => {
-      utils.loan.list.invalidate()
+    onSuccess: (data) => {
+      void utils.loan.list.invalidate()
       setModalState({ type: 'none' })
       const decision = data.status === 'APPROVED' ? 'approved' : 'rejected'
+      const ltvRatio = data.valuation ? Number(data.valuation.ltvRatio) : 0
       setSuccess(
-        `Valuation completed! Loan ${decision}. LTV: ${Number(data.valuation?.ltvRatio).toFixed(2)}%`
+        `Valuation completed! Loan ${decision}. LTV: ${ltvRatio.toFixed(2)}%`
       )
       setTimeout(() => setSuccess(null), 7000)
     },
@@ -109,7 +110,7 @@ function Home() {
     propertyType: 'MULTIFAMILY' | 'RETAIL' | 'OFFICE' | 'INDUSTRIAL'
     propertySizeSqft: number
     propertyAgeYears: number
-    loanAmount: number
+    loanAmount: number | { toNumber: () => number }
   }) => {
     setModalState({
       type: 'edit',
@@ -120,7 +121,9 @@ function Home() {
         propertyType: loan.propertyType,
         propertySizeSqft: loan.propertySizeSqft,
         propertyAgeYears: loan.propertyAgeYears,
-        loanAmount: Number(loan.loanAmount),
+        loanAmount: typeof loan.loanAmount === 'number'
+          ? loan.loanAmount
+          : loan.loanAmount.toNumber(),
       },
     })
   }

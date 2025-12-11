@@ -131,7 +131,7 @@ export const loanRouter = router({
         )
 
         // Create valuation record
-        const valuation = await prisma.valuation.create({
+        await prisma.valuation.create({
           data: {
             loanId: input.loanId,
             estimatedValue: valuationResponse.estimated_value,

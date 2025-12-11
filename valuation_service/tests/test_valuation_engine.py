@@ -1,11 +1,14 @@
-import pytest
+"""Tests for the valuation engine."""
 from decimal import Decimal
+
+import pytest
+
 from app.services.valuation_engine import ValuationEngine
 from app.models.request import PropertyType
 from app.models.response import ValuationResponse
 
 
-class TestValuationEngine:
+class TestValuationEngine:  # pylint: disable=too-many-public-methods
     """Test suite for ValuationEngine."""
 
     @pytest.fixture
@@ -281,8 +284,10 @@ class TestValuationEngine:
         assert very_old_property.estimated_value == 6_000_000.00
 
         # Verify depreciation increases with age
-        assert new_property.breakdown.depreciation_factor < older_property.breakdown.depreciation_factor
-        assert older_property.breakdown.depreciation_factor < very_old_property.breakdown.depreciation_factor
+        assert (new_property.breakdown.depreciation_factor <
+                older_property.breakdown.depreciation_factor)
+        assert (older_property.breakdown.depreciation_factor <
+                very_old_property.breakdown.depreciation_factor)
 
     def test_age_comparison_across_all_property_types(self, engine):
         """
@@ -307,14 +312,21 @@ class TestValuationEngine:
             )
 
             # Assert newer property is more valuable for every property type
-            assert new_result.estimated_value > old_result.estimated_value, \
-                f"For {property_type}, a {new_age}-year-old property should be worth more than a {old_age}-year-old property"
+            assert new_result.estimated_value > old_result.estimated_value, (
+                f"For {property_type}, a {new_age}-year-old property should be "
+                f"worth more than a {old_age}-year-old property"
+            )
 
             # Verify depreciation difference
             expected_depreciation_diff = 0.20  # 20% difference (25 years - 5 years)
-            actual_depreciation_diff = old_result.breakdown.depreciation_factor - new_result.breakdown.depreciation_factor
-            assert actual_depreciation_diff == expected_depreciation_diff, \
-                f"Depreciation difference should be {expected_depreciation_diff} for {property_type}"
+            actual_depreciation_diff = (
+                old_result.breakdown.depreciation_factor -
+                new_result.breakdown.depreciation_factor
+            )
+            assert actual_depreciation_diff == expected_depreciation_diff, (
+                f"Depreciation difference should be {expected_depreciation_diff} "
+                f"for {property_type}"
+            )
 
     def test_industrial_50_year_old_vs_new_multifamily(self, engine):
         """

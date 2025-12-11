@@ -1,8 +1,10 @@
+"""Main FastAPI application module."""
+import logging
+import sys
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-import logging
-import sys
 
 from app.config import settings
 from app.api.routes import router
@@ -56,9 +58,9 @@ async def root():
 
 
 @app.exception_handler(ValueError)
-async def value_error_handler(request, exc):
+async def value_error_handler(request, exc):  # pylint: disable=unused-argument
     """Handle ValueError exceptions."""
-    logger.error(f"ValueError: {str(exc)}")
+    logger.error("ValueError: %s", str(exc))
     return JSONResponse(
         status_code=422,
         content={
@@ -69,9 +71,9 @@ async def value_error_handler(request, exc):
 
 
 @app.exception_handler(Exception)
-async def general_exception_handler(request, exc):
+async def general_exception_handler(request, exc):  # pylint: disable=unused-argument
     """Handle general exceptions."""
-    logger.error(f"Unhandled exception: {str(exc)}", exc_info=True)
+    logger.error("Unhandled exception: %s", str(exc), exc_info=True)
     return JSONResponse(
         status_code=500,
         content={
@@ -84,14 +86,14 @@ async def general_exception_handler(request, exc):
 @app.on_event("startup")
 async def startup_event():
     """Startup event handler."""
-    logger.info(f"{settings.app_name} v{settings.app_version} starting up...")
-    logger.info(f"Allowed origins: {settings.allowed_origins}")
+    logger.info("%s v%s starting up...", settings.app_name, settings.app_version)
+    logger.info("Allowed origins: %s", settings.allowed_origins)
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """Shutdown event handler."""
-    logger.info(f"{settings.app_name} shutting down...")
+    logger.info("%s shutting down...", settings.app_name)
 
 
 if __name__ == "__main__":

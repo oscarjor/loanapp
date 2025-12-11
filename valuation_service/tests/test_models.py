@@ -1,8 +1,11 @@
+"""Tests for request and response models."""
+from datetime import datetime
+
 import pytest
 from pydantic import ValidationError
+
 from app.models.request import ValuationRequest, PropertyType
 from app.models.response import ValuationResponse, ValuationBreakdown
-from datetime import datetime
 
 
 class TestValuationRequest:

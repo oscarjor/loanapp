@@ -20,7 +20,7 @@ export class ValuationClient {
   private timeout: number
 
   constructor(baseUrl?: string, timeout = 5000) {
-    this.baseUrl = baseUrl || process.env.VALUATION_SERVICE_URL || 'http://localhost:8000'
+    this.baseUrl = baseUrl ?? process.env.VALUATION_SERVICE_URL ?? 'http://localhost:8000'
     this.timeout = timeout
   }
 
@@ -45,7 +45,7 @@ export class ValuationClient {
         throw new Error(`Valuation service error: ${response.status} - ${errorText}`)
       }
 
-      return await response.json()
+      return (await response.json()) as ValuationResponse
     } catch (error) {
       clearTimeout(timeoutId)
       if (error instanceof Error && error.name === 'AbortError') {

@@ -1,5 +1,7 @@
-from pydantic_settings import BaseSettings
+"""Configuration settings for the valuation service."""
 from typing import List
+
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -23,7 +25,8 @@ class Settings(BaseSettings):
     # Logging
     log_level: str = "INFO"
 
-    class Config:
+    class Config:  # pylint: disable=too-few-public-methods
+        """Pydantic configuration."""
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = False

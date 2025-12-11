@@ -27,12 +27,12 @@ export function LoanForm({
   submitLabel = 'Create Loan',
 }: LoanFormProps) {
   const [formData, setFormData] = useState<LoanFormData>({
-    borrowerName: initialData.borrowerName || '',
-    borrowerEmail: initialData.borrowerEmail || '',
-    propertyType: initialData.propertyType || 'MULTIFAMILY',
-    propertySizeSqft: initialData.propertySizeSqft || 0,
-    propertyAgeYears: initialData.propertyAgeYears || 0,
-    loanAmount: initialData.loanAmount || 0,
+    borrowerName: initialData.borrowerName ?? '',
+    borrowerEmail: initialData.borrowerEmail ?? '',
+    propertyType: initialData.propertyType ?? 'MULTIFAMILY',
+    propertySizeSqft: initialData.propertySizeSqft ?? 0,
+    propertyAgeYears: initialData.propertyAgeYears ?? 0,
+    loanAmount: initialData.loanAmount ?? 0,
   })
 
   const [errors, setErrors] = useState<Partial<Record<keyof LoanFormData, string>>>({})
