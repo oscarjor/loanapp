@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:14-alpine
+    container_name: loanapp-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: loanapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - loanapp
+
+  # Python Valuation Service
+  valuation_service:
+    build:
+      context: ./valuation_service
+      dockerfile: Dockerfile
+    container_name: loanapp-valuation-service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - ALLOWED_ORIGINS=["http://localhost:3000","http://main_app:3000"]
+      - LOG_LEVEL=INFO
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - loanapp
+
+  # Main Application (TanStack Start + tRPC)
+  # Note: Due to TanStack Start being in active development, run locally instead:
+  # cd main_app && npm install && npm run dev
+  #
+  # Uncomment below to run in Docker (experimental):
+  # main_app:
+  #   build:
+  #     context: ./main_app
+  #     dockerfile: Dockerfile
+  #   container_name: loanapp-main-app
+  #   restart: unless-stopped
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - DATABASE_URL=postgresql://postgres:password@postgres:5432/loanapp
+  #     - VALUATION_SERVICE_URL=http://valuation_service:8000
+  #     - PORT=3000
+  #     - NODE_ENV=development
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     valuation_service:
+  #       condition: service_healthy
+  #   networks:
+  #     - loanapp
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  loanapp:
+    driver: bridge

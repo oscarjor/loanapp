@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "noEmit": true,
+    "types": ["vite/client"],
+    "paths": {
+      "~/*": ["./app/*"],
+      "@/*": ["./server/*"]
+    }
+  },
+  "include": [
+    "app/**/*",
+    "server/**/*",
+    ".vinxi/**/*"
+  ],
+  "exclude": ["node_modules"]
+}
