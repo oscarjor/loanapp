@@ -2,14 +2,11 @@ import express from 'express'
 import { createExpressMiddleware } from '@trpc/server/adapters/express'
 import { appRouter } from './routers/index'
 import { createServer as createViteServer } from 'vite'
-import path from 'path'
-import { fileURLToPath } from 'url'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-
+// Main server startup function
 async function startServer() {
   const app = express()
-  const PORT = process.env.PORT || 3000
+  const PORT = process.env.PORT ?? 3000
 
   // Body parser middleware
   app.use(express.json())
@@ -34,7 +31,7 @@ async function startServer() {
   )
 
   // Health check endpoint (before Vite middleware)
-  app.get('/api/health', (req, res) => {
+  app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() })
   })
 
