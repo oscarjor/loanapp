@@ -1,5 +1,3 @@
-// Prisma schema for Loan Application Portal
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -25,52 +23,28 @@ enum LoanStatus {
 
 model Loan {
   id                String       @id @default(uuid())
-
-  // Borrower info
-  borrowerName      String       @map("borrower_name")
-  borrowerEmail     String       @map("borrower_email")
-  borrowerPhone     String?      @map("borrower_phone")
-
-  // Property details
-  propertyType      PropertyType @map("property_type")
-  propertySizeSqft  Int          @map("property_size_sqft")
-  propertyAgeYears  Int          @map("property_age_years")
-  propertyAddress   String?      @map("property_address")
-
-  // Loan details
-  loanAmount        Decimal      @map("loan_amount") @db.Decimal(15, 2)
-
-  // Status
+  borrowerName      String
+  borrowerEmail     String
+  propertyType      PropertyType
+  propertySizeSqft  Int
+  propertyAgeYears  Int
+  loanAmount        Decimal      @db.Decimal(15, 2)
   status            LoanStatus   @default(DRAFT)
-
-  // Timestamps
-  createdAt         DateTime     @default(now()) @map("created_at")
-  updatedAt         DateTime     @updatedAt @map("updated_at")
-
-  // Relations
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
   valuation         Valuation?
 
-  @@map("loans")
   @@index([status])
-  @@index([createdAt(sort: Desc)])
+  @@index([borrowerEmail])
 }
 
 model Valuation {
-  id                String    @id @default(uuid())
-
-  // Foreign key
-  loanId            String    @unique @map("loan_id")
-  loan              Loan      @relation(fields: [loanId], references: [id], onDelete: Cascade)
-
-  // Valuation results
-  estimatedValue    Decimal   @map("estimated_value") @db.Decimal(15, 2)
-  ltvRatio          Decimal   @map("ltv_ratio") @db.Decimal(5, 2)
-  decision          String    // 'approved' | 'rejected'
-
-  // Metadata
-  valuationDate     DateTime  @default(now()) @map("valuation_date")
-  methodology       String?   // Optional description
-
-  @@map("valuations")
-  @@index([loanId])
+  id              String   @id @default(uuid())
+  loanId          String   @unique
+  loan            Loan     @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  estimatedValue  Decimal  @db.Decimal(15, 2)
+  ltvRatio        Decimal  @db.Decimal(5, 2)
+  decision        String
+  valuationDate   DateTime @default(now())
+  createdAt       DateTime @default(now())
 }

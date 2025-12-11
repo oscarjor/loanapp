@@ -45,30 +45,26 @@ services:
       - loanapp
 
   # Main Application (TanStack Start + tRPC)
-  # Note: Due to TanStack Start being in active development, run locally instead:
-  # cd main_app && npm install && npm run dev
-  #
-  # Uncomment below to run in Docker (experimental):
-  # main_app:
-  #   build:
-  #     context: ./main_app
-  #     dockerfile: Dockerfile
-  #   container_name: loanapp-main-app
-  #   restart: unless-stopped
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     - DATABASE_URL=postgresql://postgres:password@postgres:5432/loanapp
-  #     - VALUATION_SERVICE_URL=http://valuation_service:8000
-  #     - PORT=3000
-  #     - NODE_ENV=development
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     valuation_service:
-  #       condition: service_healthy
-  #   networks:
-  #     - loanapp
+  main_app:
+    build:
+      context: ./main_app
+      dockerfile: Dockerfile
+    container_name: loanapp-main-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/loanapp
+      - VALUATION_SERVICE_URL=http://valuation_service:8000
+      - PORT=3000
+      - NODE_ENV=development
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valuation_service:
+        condition: service_healthy
+    networks:
+      - loanapp
 
 volumes:
   postgres_data:
