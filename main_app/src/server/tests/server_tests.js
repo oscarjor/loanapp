@@ -25,7 +25,7 @@ async function testLoanAPI() {
   response = await fetch(`${baseUrl}/loan.create`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(loanData),
+    body: JSON.stringify({ json: loanData }),
   });
   data = await response.json();
   console.log('Response:', JSON.stringify(data, null, 2));
@@ -45,7 +45,7 @@ async function testLoanAPI() {
     response = await fetch(`${baseUrl}/loan.requestValuation`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ loanId }),
+      body: JSON.stringify({ json: { loanId } }),
     });
     data = await response.json();
     console.log('Response:', JSON.stringify(data, null, 2));
