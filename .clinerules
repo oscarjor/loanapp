@@ -1,0 +1,15 @@
+# Project Context - ALWAYS READ THESE FILES
+@requirements.md
+@ARCHITECTURE.md
+
+# Stack Reference
+Main App: TanStack Start, tRPC, Prisma, Tailwind CSS
+Valuation Service: FastAPI, Python
+Structure: main_app/ + valuation_service/
+
+# Rules
+- Follow requirements.md for WHAT to build
+- Follow ARCHITECTURE.md for HOW to build
+- Maintain type safety end-to-end
+- Handle all errors gracefully
+- Consider future event-driven migration
