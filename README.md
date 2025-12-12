@@ -1,6 +1,6 @@
 # Loan Application Portal
 
-A commercial real estate loan application platform with property valuation and automated LTV-based approval.
+A commercial real estate loan application platform with property valuation, automated LTV-based approval, and an AI-powered chat assistant.
 
 ⚠️ **IMPORTANT**: Always reference these before coding:
 - 📋 [requirements.md](./requirements.md) - What to build
@@ -15,6 +15,7 @@ A commercial real estate loan application platform with property valuation and a
 - **Database**: PostgreSQL
 - **Styling**: Tailwind CSS
 - **Language**: TypeScript
+- **AI**: Vercel AI SDK with OpenAI GPT-4o-mini
 
 ### Valuation Service (Port 8000)
 - **Framework**: FastAPI
@@ -122,6 +123,34 @@ npm run dev
 ```
 
 Main app will be available at: http://localhost:3000
+
+## Features
+
+### 1. Loan Application Management
+- Create, read, update, and delete loan applications
+- Track loan status (DRAFT, PENDING_VALUATION, APPROVED, REJECTED)
+- Store borrower information and property details
+
+### 2. Property Valuation
+- Integration with external valuation microservice
+- Formula-based property valuation using property type, size, and age
+- Automatic LTV (Loan-to-Value) calculation
+- Automated approval/rejection based on LTV threshold (≤75% = APPROVED)
+
+### 3. AI Chat Assistant (NEW!)
+- Conversational AI powered by OpenAI GPT-4o-mini
+- Natural language loan application creation
+- Guided data collection process
+- Function calling to create loans and request valuations
+- Real-time streaming responses
+- Available at `/chat` route
+
+**Chat Assistant Capabilities:**
+- Asks for loan information conversationally
+- Validates input as you provide it
+- Creates loan applications automatically
+- Requests property valuations
+- Shows results with approval/rejection decisions
 
 ## Local Development Setup
 
@@ -360,10 +389,11 @@ chmod +x .git/hooks/pre-commit
 ```bash
 DATABASE_URL="postgresql://postgres:password@localhost:5432/loanapp"
 VALUATION_SERVICE_URL="http://localhost:8000"
-VALUATION_SERVICE_TIMEOUT=5000
 PORT=3000
-NODE_ENV=development
+OPENAI_API_KEY="your-openai-api-key-here"  # Required for AI chat assistant
 ```
+
+**Note:** Get your OpenAI API key from https://platform.openai.com/api-keys
 
 ### Valuation Service (.env)
 ```bash

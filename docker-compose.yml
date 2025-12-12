@@ -58,6 +58,7 @@ services:
       - VALUATION_SERVICE_URL=http://valuation_service:8000
       - PORT=3000
       - NODE_ENV=development
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     depends_on:
       postgres:
         condition: service_healthy
